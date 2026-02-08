@@ -25,6 +25,7 @@ class TopologyParser:
         self._dir_nums = len(dirs)
         # module 1: 1, 2, 3, ..., 8
         # module 2: 9, 10, 11, ..., 16
+        #
         self._module_nums = module_nums
         self._assert_good_init()
 
