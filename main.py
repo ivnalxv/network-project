@@ -40,7 +40,7 @@ def main():
     cdg_graph.print_mermaid(str(output_file_path))
 
     cycle_checker = CycleChecker(cdg_graph)
-    print(f'Has cycle: {cycle_checker.has_cycle()}')
+    # print(f'Has cycle: {cycle_checker.has_cycle()}')
     cycle_checker.print_detailed_cycle()
 
 

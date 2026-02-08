@@ -108,7 +108,6 @@ class CycleChecker:
     in_recursion: Set[int]
     graph: Graph
     cycle_path: List[int]
-    # TODO:: добавить вывод цикла
 
     def __init__(self, graph: Graph):
         self.graph = graph
@@ -117,6 +116,7 @@ class CycleChecker:
         self.cycle_path = []
 
     def has_cycle(self) -> bool:
+        self._clear_checker_data()
         all_nodes = self.graph.all_nodes
 
         for node in all_nodes:
@@ -126,6 +126,7 @@ class CycleChecker:
         return False
 
     def find_cycle(self) -> List[int]:
+        self._clear_checker_data()
         all_nodes = self.graph.all_nodes
 
         for node in all_nodes:
@@ -136,12 +137,17 @@ class CycleChecker:
         return []
 
     def print_detailed_cycle(self):
+        self._clear_checker_data()
         cycle = self.find_cycle()
 
         print('\nCycle:')
         for node_id in cycle:
             print(self.graph.get_node_by_id(node_id))
 
+    def _clear_checker_data(self):
+        self.visited_node_ids = set()
+        self.in_recursion = set()
+        self.cycle_path = []
 
     def _dfs(self, node_id: int) -> bool:
         self.cycle_path.append(node_id)
