@@ -41,6 +41,7 @@ def main():
 
     cycle_checker = CycleChecker(cdg_graph)
     print(f'Has cycle: {cycle_checker.has_cycle()}')
+    cycle_checker.print_detailed_cycle()
 
 
 def _get_topology_parser(

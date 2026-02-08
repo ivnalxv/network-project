@@ -107,12 +107,14 @@ class CycleChecker:
     visited_node_ids: Set[int]
     in_recursion: Set[int]
     graph: Graph
+    cycle_path: List[int]
     # TODO:: добавить вывод цикла
 
     def __init__(self, graph: Graph):
         self.graph = graph
         self.visited_node_ids = set()
         self.in_recursion = set()
+        self.cycle_path = []
 
     def has_cycle(self) -> bool:
         all_nodes = self.graph.all_nodes
@@ -123,11 +125,32 @@ class CycleChecker:
                 return True
         return False
 
+    def find_cycle(self) -> List[int]:
+        all_nodes = self.graph.all_nodes
+
+        for node in all_nodes:
+            node_id = node.id_
+            self.cycle_path = []
+            if (not self._is_visited(node_id)) and self._dfs(node_id):
+                return self.cycle_path
+        return []
+
+    def print_detailed_cycle(self):
+        cycle = self.find_cycle()
+
+        print('\nCycle:')
+        for node_id in cycle:
+            print(self.graph.get_node_by_id(node_id))
+
+
     def _dfs(self, node_id: int) -> bool:
+        self.cycle_path.append(node_id)
+
         if self._is_in_recursion(node_id):
             return True
 
         if self._is_visited(node_id):
+            self.cycle_path.pop()
             return False
 
         self.in_recursion.add(node_id)
@@ -139,6 +162,7 @@ class CycleChecker:
                 return True
 
         self.in_recursion.remove(node_id)
+        self.cycle_path.pop()
         return False
 
     def _is_visited(self, node_id: int) -> bool:
