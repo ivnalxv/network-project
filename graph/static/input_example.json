@@ -1,0 +1,142 @@
+{
+  "sw1": {
+    "switches": [
+      {
+        "portA": 1,
+        "switchB": "sw2",
+        "portB": 2
+      },
+      {
+        "portA": 2,
+        "switchB": "sw2",
+        "portB": 1
+      },
+      {
+        "portA": 9,
+        "switchB": "sw2",
+        "portB": 10
+      },
+      {
+        "portA": 10,
+        "switchB": "sw2",
+        "portB": 9
+      },
+      {
+        "portA": 17,
+        "switchB": "sw2",
+        "portB": 18
+      },
+      {
+        "portA": 18,
+        "switchB": "sw2",
+        "portB": 17
+      },
+      {
+        "portA": 25,
+        "switchB": "sw2",
+        "portB": 26
+      },
+      {
+        "portA": 26,
+        "switchB": "sw2",
+        "portB": 25
+      }
+    ],
+    "nodes": [
+      {
+        "portA": 3,
+        "nodeB": "n1",
+        "portB": 1
+      },
+      {
+        "portA": 11,
+        "nodeB": "n2",
+        "portB": 1
+      }
+    ]
+  },
+  "sw2": {
+    "switches": [
+      {
+        "portA": 1,
+        "switchB": "sw1",
+        "portB": 2
+      },
+      {
+        "portA": 2,
+        "switchB": "sw1",
+        "portB": 1
+      },
+      {
+        "portA": 9,
+        "switchB": "sw1",
+        "portB": 10
+      },
+      {
+        "portA": 10,
+        "switchB": "sw1",
+        "portB": 9
+      },
+      {
+        "portA": 17,
+        "switchB": "sw1",
+        "portB": 18
+      },
+      {
+        "portA": 18,
+        "switchB": "sw1",
+        "portB": 17
+      },
+      {
+        "portA": 25,
+        "switchB": "sw1",
+        "portB": 26
+      },
+      {
+        "portA": 26,
+        "switchB": "sw1",
+        "portB": 25
+      }
+    ],
+    "nodes": [
+      {
+        "portA": 3,
+        "nodeB": "n3",
+        "portB": 1
+      },
+      {
+        "portA": 11,
+        "nodeB": "n4",
+        "portB": 1
+      }
+    ]
+  },
+  "n1": [
+    {
+      "portA": 1,
+      "switchB": "sw1",
+      "portB": 3
+    }
+  ],
+  "n2": [
+    {
+      "portA": 1,
+      "switchB": "sw1",
+      "portB": 11
+    }
+  ],
+  "n3": [
+    {
+      "portA": 1,
+      "switchB": "sw2",
+      "portB": 3
+    }
+  ],
+  "n4": [
+    {
+      "portA": 1,
+      "switchB": "sw2",
+      "portB": 11
+    }
+  ]
+}
