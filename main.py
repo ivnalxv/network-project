@@ -4,6 +4,7 @@ from typing import List
 from graph import topology_parser
 from graph.cdg import CdgBuilder, CycleChecker
 from graph.entities import Graph, NdTorus
+from graph.torus import Torus
 
 script_dir = Path(__file__).parent
 
@@ -17,31 +18,42 @@ def main():
     graph = parser.parse_topology(str(input_file_path))
 
     file_name = "graph/static/output/graph.md"
-    output_file_path = script_dir / file_name
-    graph.print_mermaid(str(output_file_path))
+    file_path = script_dir / file_name
+    graph.print_mermaid(str(file_path))
 
-    torus = NdTorus(graph, base_dimensions, module_nums)
+    new_torus = Torus(graph, base_dimensions, module_nums)
+    file_name = "graph/static/output/processed_graph.md"
+    file_path = script_dir / file_name
+    new_torus.topology_graph.print_mermaid(str(file_path))
 
-    print('\nReal nodes:')
-    for node in torus.get_real_nodes():
-        print(node)
+    next_node = new_torus.next_node(from_node_id=5, by_module=3, by_direction='+K')
+    print(f'\nNext node: {next_node}')
 
-    dim_order = ['+K', '+Z', '+Y', '-K', '-Z', '-Y', '+X', '-X']
-    cdg = CdgBuilder(torus, dim_order)
+    next_node = new_torus.next_node(from_node_id=5, by_module=1, by_direction='+K')
+    print(f'\nNext node: {next_node}')
 
-    from_dim = '-X'
-    to_dim = '+X'
-    print(f'\nTurn from "{from_dim}" to "{to_dim}" possible: {cdg.check_turn(from_dim, to_dim)}')
 
-    cdg_graph = cdg.build_cdg_graph()
-
-    file_name = "graph/static/output/cdg_graph.md"
-    output_file_path = script_dir / file_name
-    cdg_graph.print_mermaid(str(output_file_path))
-
-    cycle_checker = CycleChecker(cdg_graph)
-    # print(f'Has cycle: {cycle_checker.has_cycle()}')
-    cycle_checker.print_detailed_cycle()
+    # torus = NdTorus(graph, base_dimensions, module_nums)
+    # print('\nReal nodes:')
+    # for node in torus.get_real_nodes():
+    #     print(node)
+    #
+    # dim_order = ['+K', '+Z', '+Y', '-K', '-Z', '-Y', '+X', '-X']
+    # cdg = CdgBuilder(torus, dim_order)
+    #
+    # from_dim = '-X'
+    # to_dim = '+X'
+    # print(f'\nTurn from "{from_dim}" to "{to_dim}" possible: {cdg.check_turn(from_dim, to_dim)}')
+    #
+    # cdg_graph = cdg.build_cdg_graph()
+    #
+    # file_name = "graph/static/output/cdg_graph.md"
+    # output_file_path = script_dir / file_name
+    # cdg_graph.print_mermaid(str(output_file_path))
+    #
+    # cycle_checker = CycleChecker(cdg_graph)
+    # # print(f'Has cycle: {cycle_checker.has_cycle()}')
+    # cycle_checker.print_detailed_cycle()
 
 
 def _get_topology_parser(

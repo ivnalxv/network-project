@@ -1,4 +1,3 @@
-```mermaid
 graph LR
 %% Терминал
 	3[Терминал node_n1]:::terminal
@@ -90,4 +89,3 @@ graph LR
 classDef terminal fill:#F45B69,stroke:#333,stroke-width:2px
         classDef switch fill:#688EB6,stroke:#333,stroke-width:2px
         classDef edgenode fill:#E4FDE1,stroke:#333,stroke-width:2px
-```

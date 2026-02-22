@@ -7,18 +7,19 @@ from typing import Dict
 from typing import List
 from typing import Set
 
-from graph.entities import Node, Graph, NdTorus
+from graph.entities import Node, Graph
+from graph.torus import Torus
 
 
 class CdgBuilder:
     dimensions_order: List[str]
-    torus: NdTorus
+    torus: Torus
 
     _builder_node_id_to_node: Dict[int, Node]
     _builder_nodes_from: Dict[int, Set[int]]
     _builder_nodes_to: Dict[int, Set[int]]
 
-    def __init__(self, torus: NdTorus, dim_order: List[str]):
+    def __init__(self, torus: Torus, dim_order: List[str]):
         self.dimensions_order = dim_order
         self.torus = torus
 
@@ -51,8 +52,6 @@ class CdgBuilder:
 
     def build_cdg_graph(self) -> Graph:
         edge_nodes = self.torus.get_edges()
-        print('\nALL EDGES:')
-        print(edge_nodes)
 
         for edge_node in edge_nodes:
             self._builder_node_id_to_node[edge_node.id_] = edge_node

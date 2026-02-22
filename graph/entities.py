@@ -79,7 +79,6 @@ class Graph:
             self._print_mermaid(f)
 
     def _print_mermaid(self, file: TextIO) -> None:
-        file.write('```mermaid\n')
         file.write('graph LR\n')
 
         file.write('%% Терминал\n')
@@ -107,7 +106,60 @@ class Graph:
         \nclassDef terminal fill:#F45B69,stroke:#333,stroke-width:2px
         classDef switch fill:#688EB6,stroke:#333,stroke-width:2px
         classDef edgenode fill:#E4FDE1,stroke:#333,stroke-width:2px\n""")
-        file.write('```\n')
+
+
+@dataclasses.dataclass
+class NonDirectionalGraph:
+    all_nodes: List[Node]
+    id_to_node: Dict[int, Node]
+    nodes_from: Dict[int, Set[int]]
+
+    def __init__(self, nodes: List[Node], nodes_from: Dict[int, Set[int]]) -> 'NonDirectionalGraph':
+        self.id_to_node: Dict[int, Node] = {}
+        self.all_nodes = copy.deepcopy(nodes)
+        self.nodes_from = copy.deepcopy(nodes_from)
+
+        for node in self.all_nodes:
+            self.id_to_node[node.id_] = node
+
+    def get_node_by_id(self, node_id: int) -> Node:
+        if node_id not in self.id_to_node:
+            raise ValueError(f'Node with id {node_id} not found')
+        return self.id_to_node[node_id]
+
+    def print_mermaid(self, file_name: str) -> None:
+        with open(file_name, 'w') as f:
+            self._print_mermaid(f)
+
+    def _print_mermaid(self, file: TextIO) -> None:
+        file.write('graph LR\n')
+
+        file.write('%% Терминал\n')
+        for node in self.all_nodes:
+            if not node.name.startswith('node_'): continue
+            file.write(f'\t{node.id_}[Терминал {node.name}]:::terminal\n')
+
+        file.write('\n%% Коммутаторы\n')
+        for node in self.all_nodes:
+            if not node.name.startswith('switch_'): continue
+            file.write(f'\t{node.id_}[Коммутатор {node.name}]:::switch\n')
+
+        file.write('\n%% Узлы-ребра\n')
+        for node in self.all_nodes:
+            if not node.name.startswith('edge_'): continue
+            file.write(f'\t{node.id_}["{node.name}"]:::edgenode\n')
+
+        file.write('\n%% Ребры графа\n')
+        for from_node_id, to_node_ids in self.nodes_from.items():
+            for to_node_id in to_node_ids:
+                if to_node_id >= from_node_id:
+                    file.write(f'\t{from_node_id} <---> {to_node_id}\n')
+                    # sw1 --- sw2
+
+        file.write("""
+        \nclassDef terminal fill:#F45B69,stroke:#333,stroke-width:2px
+        classDef switch fill:#688EB6,stroke:#333,stroke-width:2px
+        classDef edgenode fill:#E4FDE1,stroke:#333,stroke-width:2px\n""")
 
 
 @dataclasses.dataclass

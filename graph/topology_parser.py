@@ -38,6 +38,10 @@ class TopologyParser:
         val = (port - 1) % self._dir_nums
         return self._dir_names[val]
 
+    def get_module(self, port: int) -> int:
+        val = (port - 1) // self._dir_nums
+        return val + 1
+
     def add_node_name(self, name: str) -> int:
         if name in self._names:
             raise ValueError(f'Node name "{name}" already exists')
@@ -136,6 +140,12 @@ class TopologyParser:
     ) -> None:
         port_a_dir = self.get_direction_name(from_port)
         port_b_dir = self.get_direction_name(to_port)
+        port_a_module = self.get_module(from_port)
+        port_b_module = self.get_module(to_port)
+
+        if 'switch' in from_node_name and 'switch' in to_node_name:
+            # Верно только ребере между свитчами
+            assert port_a_module == port_b_module, 'Modules must be the same in switch edge'
 
         from_name = f'[{from_node_name}_{from_port}_{port_a_dir}]'
         to_name = f'[{to_node_name}_{to_port}_{port_b_dir}]'
@@ -147,13 +157,14 @@ class TopologyParser:
 
         self._node_id_to_tags[node_id] = [
             'edge',
-            f'from_port:1',
             f'from_port:{from_port}',
             f'to_port:{to_port}',
             f'from_dir:{port_a_dir}',
             f'to_dir:{port_b_dir}',
             f'from_node:{from_node_name}',
             f'to_node:{to_node_name}',
+            f'from_module:{port_a_module}',
+            f'to_module:{port_b_module}',
         ]
 
     def cast_to_graph(self) -> Graph:
