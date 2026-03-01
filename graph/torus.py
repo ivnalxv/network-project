@@ -33,7 +33,7 @@ class Torus:
     def get_by_node_id(self, node_id: int) -> Node:
         return self.topology_graph.get_node_by_id(node_id)
 
-    def next_node(self, from_node_id: int, by_module: int, by_direction: str) -> Node:
+    def next_switch_node(self, from_node_id: int, by_module: int, by_direction: str) -> Node:
         forward_node_ids = self.topology_graph.nodes_from[from_node_id]
 
         for forward_node_id in forward_node_ids:
@@ -45,15 +45,86 @@ class Torus:
                 continue
 
             edge_id = forward_node.get_tag_int_value('edge_id')
-            edge_nodes = self.get_edge_nodes(edge_id)
-            if edge_nodes[0] == from_node_id:
-                return self.get_by_node_id(edge_nodes[1])
-            return self.get_by_node_id(edge_nodes[0])
+            edge_nodes = self.get_pair_node_ids_by_edge(edge_id)
+            next_node_id = edge_nodes[0]
 
+            if next_node_id == from_node_id:
+                next_node_id = edge_nodes[1]
+
+            next_node = self.get_by_node_id(next_node_id)
+            if 'switch' not in next_node.tags:
+                print(f'Skipping next not switch node: {next_node}')
+                continue
+            return next_node
         assert False, 'No next node found'
 
-    def get_edge_nodes(self, edge_id: int) -> (int, int):
-        return self.edge_id_to_connected[edge_id]
+    def get_pair_node_ids_by_edge(self, edge_id: int) -> (int, int):
+        one, two = self.edge_id_to_connected[edge_id]
+        if one < two:
+            return one, two
+        return two, one
+
+    def get_pair_nodes_by_edge(self, edge_id: int) -> (Node, Node):
+        one, two = self.get_pair_nodes_by_edge(edge_id)
+        return self.get_by_node_id(one), self.get_by_node_id(two)
+
+    def get_direction_by_edge_from_node(self, from_node_id: int, by_edge_id: int) -> str:
+        one, two = self.get_pair_node_ids_by_edge(by_edge_id)
+        assert from_node_id == one or from_node_id == two, f'Bad direction by edge:from_node_id: {from_node_id} should be either [{one}, {two}]'
+
+        forward_edge_node_ids = self.topology_graph.nodes_from[from_node_id]
+        for forward_edge_node_id in forward_edge_node_ids:
+            forward_edge_node = self.get_by_node_id(forward_edge_node_id)
+            edge_id = forward_edge_node.get_tag_int_value('edge_id')
+            if edge_id != by_edge_id: continue
+            return forward_edge_node.get_tag_str_value('direction')
+        assert False, f'No direction found: from_node_id: {from_node_id}, by_edge_id: {by_edge_id}'
+
+    def get_adjacent_edges_by_edge_id(self, by_edge_id: int) -> Set[int]:
+        one, two = self.get_pair_node_ids_by_edge(by_edge_id)
+
+        one_edge_ids = self.get_adjacent_edges_by_node_id(one)
+        one_edge_ids.remove(by_edge_id)
+        two_edge_ids = self.get_adjacent_edges_by_node_id(two)
+        two_edge_ids.remove(by_edge_id)
+
+        return one_edge_ids.union(two_edge_ids)
+
+    def get_adjacent_edges_by_node_id(self, by_node_id: int) -> Set[int]:
+        true_node = self.get_by_node_id(by_node_id)
+        assert not true_node.has_tag('edge'), f'Node {true_node} is not a True Node'
+
+        forward_edge_node_ids = self.topology_graph.nodes_from[by_node_id]
+        set_ids = set()
+        for forward_edge_node_id in forward_edge_node_ids:
+            forward_edge_node = self.get_by_node_id(forward_edge_node_id)
+            edge_id = forward_edge_node.get_tag_int_value('edge_id')
+            set_ids.add(edge_id)
+        return set_ids
+
+    def get_connecting_node_id_by_edges(self, edge_id_a: int, edge_id_b: int) -> List[int]:
+        one, two = self.get_pair_node_ids_by_edge(edge_id_a)
+        set_a = {one, two}
+
+        three, four = self.get_pair_node_ids_by_edge(edge_id_b)
+        set_b = {three, four}
+
+        intersection = set_a.intersection(set_b)
+        if len(intersection) == 2:
+            print(f'Funny intersection edge_id_a: {edge_id_a}, edge_id_b: {edge_id_b}: intersection={intersection}')
+        if len(intersection) > 0:
+            return list(intersection)
+        assert False, f'No connecting node found: edge_id_a: {edge_id_a}, edge_id_b: {edge_id_b}'
+
+    def get_all_edge_ids(self) -> List[int]:
+        return list(self.edge_id_to_connected.keys())
+
+    def get_all_edge_nodes(self) -> List[Node]:
+        all_edge_nodes = []
+        for edge_node in self.topology_graph.all_nodes:
+            if edge_node.has_tag('edge'):
+                all_edge_nodes.append(edge_node)
+        return all_edge_nodes
 
 
 class TorusGraphBuilder:

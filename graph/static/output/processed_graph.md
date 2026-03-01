@@ -10,32 +10,32 @@ graph LR
 	6[Коммутатор switch_sw2]:::switch
 
 %% Узлы-ребра
-	7["edge_-K_1"]:::edgenode
-	8["edge_+K_1"]:::edgenode
-	9["edge_+K_1"]:::edgenode
-	10["edge_-K_1"]:::edgenode
-	11["edge_-K_2"]:::edgenode
-	12["edge_+K_2"]:::edgenode
-	13["edge_+K_2"]:::edgenode
-	14["edge_-K_2"]:::edgenode
-	15["edge_-K_3"]:::edgenode
-	16["edge_+K_3"]:::edgenode
-	17["edge_+K_3"]:::edgenode
-	18["edge_-K_3"]:::edgenode
-	19["edge_-K_4"]:::edgenode
-	20["edge_+K_4"]:::edgenode
-	21["edge_+K_4"]:::edgenode
-	22["edge_-K_4"]:::edgenode
-	23["edge_+K_1"]:::edgenode
-	24["edge_+Z_1"]:::edgenode
-	25["edge_+K_1"]:::edgenode
-	26["edge_+Z_2"]:::edgenode
-	27["edge_+K_1"]:::edgenode
-	28["edge_+Z_1"]:::edgenode
-	29["edge_+K_1"]:::edgenode
-	30["edge_+Z_2"]:::edgenode
+	7["edge_-K_1(1)"]:::edgenode
+	8["edge_+K_1(1)"]:::edgenode
+	9["edge_+K_1(2)"]:::edgenode
+	10["edge_-K_1(2)"]:::edgenode
+	11["edge_-K_2(3)"]:::edgenode
+	12["edge_+K_2(3)"]:::edgenode
+	13["edge_+K_2(4)"]:::edgenode
+	14["edge_-K_2(4)"]:::edgenode
+	15["edge_-K_3(5)"]:::edgenode
+	16["edge_+K_3(5)"]:::edgenode
+	17["edge_+K_3(6)"]:::edgenode
+	18["edge_-K_3(6)"]:::edgenode
+	19["edge_-K_4(7)"]:::edgenode
+	20["edge_+K_4(7)"]:::edgenode
+	21["edge_+K_4(8)"]:::edgenode
+	22["edge_-K_4(8)"]:::edgenode
+	23["edge_+K_1(9)"]:::edgenode
+	24["edge_+Z_1(9)"]:::edgenode
+	25["edge_+K_1(10)"]:::edgenode
+	26["edge_+Z_2(10)"]:::edgenode
+	27["edge_+K_1(11)"]:::edgenode
+	28["edge_+Z_1(11)"]:::edgenode
+	29["edge_+K_1(12)"]:::edgenode
+	30["edge_+Z_2(12)"]:::edgenode
 
-%% Ребры графа
+%% Ребра графа
 	5 <---> 7
 	5 <---> 9
 	5 <---> 11

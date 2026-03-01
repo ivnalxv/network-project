@@ -7,10 +7,10 @@ graph LR
 	5[Нода edge_5]:::node
 	6[Нода edge_6]:::node
 	7[Нода edge_7]:::node
-	8[Нода edge_8]:::node
+	8[Нода edge_8]:::cycleNode
 	9[Нода edge_9]:::node
 	10[Нода edge_10]:::node
-	11[Нода edge_11]:::node
+	11[Нода edge_11]:::cycleNode
 	12[Нода edge_12]:::node
 
 %% Ребра графа
@@ -53,5 +53,8 @@ graph LR
 	7 <---> 9
 	7 <---> 10
 
-        
+                
 classDef node fill:#F45B69,stroke:#333,stroke-width:2px
+                
+classDef cycleNode fill:#688EB6,stroke:#333,stroke-width:2px
+                

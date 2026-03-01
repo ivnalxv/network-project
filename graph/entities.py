@@ -127,11 +127,11 @@ class NonDirectionalGraph:
             raise ValueError(f'Node with id {node_id} not found')
         return self.id_to_node[node_id]
 
-    def print_mermaid(self, file_name: str) -> None:
+    def print_torus_mermaid(self, file_name: str) -> None:
         with open(file_name, 'w') as f:
-            self._print_mermaid(f)
+            self._print_torus_mermaid(f)
 
-    def _print_mermaid(self, file: TextIO) -> None:
+    def _print_torus_mermaid(self, file: TextIO) -> None:
         file.write('graph LR\n')
 
         file.write('%% Терминал\n')
@@ -147,9 +147,10 @@ class NonDirectionalGraph:
         file.write('\n%% Узлы-ребра\n')
         for node in self.all_nodes:
             if not node.name.startswith('edge_'): continue
-            file.write(f'\t{node.id_}["{node.name}"]:::edgenode\n')
+            edge_id = node.get_tag_int_value('edge_id')
+            file.write(f'\t{node.id_}["{node.name}({edge_id})"]:::edgenode\n')
 
-        file.write('\n%% Ребры графа\n')
+        file.write('\n%% Ребра графа\n')
         for from_node_id, to_node_ids in self.nodes_from.items():
             for to_node_id in to_node_ids:
                 if to_node_id >= from_node_id:
@@ -161,111 +162,23 @@ class NonDirectionalGraph:
         classDef switch fill:#688EB6,stroke:#333,stroke-width:2px
         classDef edgenode fill:#E4FDE1,stroke:#333,stroke-width:2px\n""")
 
+    def print_simple_mermaid(self, file_name: str) -> None:
+        with open(file_name, 'w') as f:
+            self._print_simple_mermaid(f)
 
-@dataclasses.dataclass
-class NdTorus(Graph):
-    base_dimensions: List[str]
-    modules: int
+    def _print_simple_mermaid(self, file: TextIO) -> None:
+        file.write('graph LR\n')
 
-    def get_real_nodes(self):
-        return [node for node in self.all_nodes if 'edge' not in node.tags]
-
-    def get_switches(self):
-        return [node for node in self.all_nodes if 'switch' in node.tags]
-
-    def get_terminals(self):
-        return [node for node in self.all_nodes if 'terminal' in node.tags]
-
-    def get_edges(self):
-        return [node for node in self.all_nodes if 'edge' in node.tags]
-
-    def __init__(
-            self,
-            graph: Graph,
-            dimensions: List[str],
-            modules: int,
-    ):
-        super().__init__(
-            nodes=graph.all_nodes,
-            nodes_from=graph.nodes_from,
-            nodes_to=graph.nodes_to,
-        )
-        self.base_dimensions = dimensions
-        self.modules = modules
-        self._assert_good_torus_init()
-
-    def _assert_good_torus_init(self) -> None:
-        assert len(self.base_dimensions) > 0
-        self._assert_good_dims()
-        self._assert_edges_has_tags()
-        self._assert_switches_edges_has_same_module()
-
-    def _assert_good_dims(self) -> None:
-        node_dims: Set[str] = set()
+        file.write('%% Ноды\n')
         for node in self.all_nodes:
-            if not node.name.startswith('edge_'): continue
-            for tag in node.tags:
-                if tag.startswith('from_dir:') or tag.startswith('to_dir:'):
-                    direction = tag.split(':')[1]
-                    assert len(direction) == 2, f'dimension should have direction: {node}'
-                    node_dims.add(direction[1])
+            file.write(f'\t{node.id_}[Нода {node.name}]:::node\n')
 
-        torus_dims = set(self.base_dimensions)
-        assert node_dims.issubset(torus_dims), f'dimensions should be in {torus_dims}: {node_dims}'
+        file.write('\n%% Ребра графа\n')
+        for from_node_id, to_node_ids in self.nodes_from.items():
+            for to_node_id in to_node_ids:
+                if to_node_id >= from_node_id:
+                    file.write(f'\t{from_node_id} <---> {to_node_id}\n')
+                    # sw1 --- sw2
 
-    def _assert_edges_has_tags(self) -> None:
-        tag_pairs = [['from_port', 'to_port'], ['from_dir', 'to_dir'], ['from_node', 'to_node']]
-        for node in self.all_nodes:
-            if not node.name.startswith('edge_'): continue
-
-            for tag_pair in tag_pairs:
-                self._assert_edge_node_has_both_tags(node, tag_pair[0], tag_pair[1])
-
-            self._assert_switch_edge_has_same_module(node)
-
-    def _assert_switches_edges_has_same_module(self) -> None:
-        for node in self.all_nodes:
-            if not node.name.startswith('edge_'): continue
-            self._assert_switch_edge_has_same_module(node)
-
-    @classmethod
-    def _assert_edge_node_has_both_tags(self, node: Node, tag_one: str, tag_two: str) -> None:
-        has_tag_one = False
-        has_tag_two = False
-        for tag in node.tags:
-            if tag.startswith(tag_one):
-                has_tag_one = True
-                split_tag = tag.split(':')
-                assert len(split_tag) == 2
-            if tag.startswith(tag_two):
-                has_tag_two = True
-                split_tag = tag.split(':')
-                assert len(split_tag) == 2
-
-        has_both_tags = has_tag_one and has_tag_two
-        assert has_both_tags, f'should has both tags=[{tag_one}, {tag_two}]: {node}'
-
-    @classmethod
-    def _assert_switch_edge_has_same_module(self, node: Node) -> None:
-        from_node = ''
-        to_node = ''
-        from_port = -1
-        to_port = -1
-        for tag in node.tags:
-            if tag.startswith('from_node:'):
-                from_node = tag.split(':')[1]
-            if tag.startswith('to_node:'):
-                to_node = tag.split(':')[1]
-            if tag.startswith('from_port:'):
-                from_port = int(tag.split(':')[1])
-            if tag.startswith('to_port:'):
-                to_port = int(tag.split(':')[1])
-
-        if not from_node.startswith('switch_:') or not to_node.startswith('switch_:'):
-            return
-
-        assert self.ports_has_same_module(from_port, to_port), f'ports should be in the same module: {node}'
-
-    def ports_has_same_module(self, from_port: int, to_port: int) -> bool:
-        dist = abs(from_port - to_port + 1)
-        return dist <= 2 * len(self.base_dimensions)
+        file.write("""
+        \nclassDef node fill:#F45B69,stroke:#333,stroke-width:2px""")
