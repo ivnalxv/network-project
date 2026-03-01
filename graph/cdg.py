@@ -238,12 +238,9 @@ class CycleChecker:
         for index in range(len(cycle) - 1, -1, -1):
             cycle_node = self.graph.get_node_by_id(cycle[index])
             node_dim = cycle_node.get_tag_str_value('direction_one_to_two')[1]
-            if node_dim != cycle_dim:
+            node_dim_two = cycle_node.get_tag_str_value('direction_two_to_one')[1]
+            if node_dim != cycle_dim and node_dim_two != cycle_dim:
                 return False
-
-            # node_dim_two = cycle_node.get_tag_str_value('direction_two_to_one')[1]
-            # if node_dim != cycle_dim and node_dim_two != cycle_dim:
-            #     return False
         return True
 
     def _print_mermaid(self, cycle: List[int], file_name: str):
